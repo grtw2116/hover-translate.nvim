@@ -1,4 +1,4 @@
-# hover_translate.nvim
+# hover-translate.nvim
 
 Translate LSP hover documentation in Neovim using Google Translate or DeepL.
 
@@ -13,7 +13,7 @@ Translate LSP hover documentation in Neovim using Google Translate or DeepL.
 
 ```lua
 {
-  "your-username/hover_translate.nvim",
+  "your-username/hover-translate.nvim",
   config = function()
     require("hover_translate").setup({
       target_lang = "ja", -- Japanese
