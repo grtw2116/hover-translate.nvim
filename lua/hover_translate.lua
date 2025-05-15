@@ -42,6 +42,11 @@ local function translate_text(text)
 		return text
 	end
 
+	-- Notify translation start if not silent
+	if not M.config.silent then
+		vim.notify("翻訳を開始しています...", vim.log.levels.INFO)
+	end
+
 	-- Send HTTP request (using plenary.nvim or curl)
 	local ok, resp = pcall(function()
 		return vim.fn.system({
@@ -63,11 +68,19 @@ local function translate_text(text)
 	end
 
 	local result = vim.fn.json_decode(resp)
+	local translated_text
 	if M.config.provider == "google" then
-		return result.data and result.data.translations[1].translatedText or text
+		translated_text = result.data and result.data.translations[1].translatedText or text
 	else -- deepl
-		return result.translations and result.translations[1].text or text
+		translated_text = result.translations and result.translations[1].text or text
 	end
+	
+	-- Notify translation complete if not silent
+	if not M.config.silent then
+		vim.notify("翻訳が完了しました", vim.log.levels.INFO)
+	end
+	
+	return translated_text
 end
 
 -- Override hover to translate contents
@@ -93,7 +106,7 @@ function M.hover(config)
 		end
 		if vim.tbl_isempty(raw) then
 			if not config.silent then
-				vim.notify("No hover information")
+				vim.notify("ホバー情報がありません", vim.log.levels.WARN)
 			end
 			return
 		end
@@ -112,3 +125,4 @@ function M.hover(config)
 end
 
 return M
+eturn M
