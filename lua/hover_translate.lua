@@ -32,7 +32,7 @@ local function translate_text(text)
 			target = M.config.target_lang,
 		})
 	elseif M.config.provider == "deepl" then
-		url = string.format("https://api.deepl.com/v2/translate?auth_key=%s", M.config.api_key)
+		url = string.format("https://api-free.deepl.com/v2/translate?auth_key=%s", M.config.api_key)
 		body = vim.fn.json_encode({
 			text = text,
 			target_lang = M.config.target_lang:upper(),
