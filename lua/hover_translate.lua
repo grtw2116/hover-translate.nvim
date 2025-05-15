@@ -76,7 +76,9 @@ function M.hover(config)
 	config.silent = M.config.silent
 
 	-- reuse original hover logic to fetch raw contents
-	lsp.buf_request_all(0, "textDocument/hover", lsp.util.make_position_params(), function(results, ctx)
+	local client = vim.lsp.get_clients({ bufnr = 0 })[1]
+	local params = vim.lsp.util.make_position_params(0, client and client.offset_encoding or "utf-16")
+	lsp.buf_request_all(0, "textDocument/hover", params, function(results, ctx)
 		if api.nvim_get_current_buf() ~= ctx.bufnr then
 			return
 		end
