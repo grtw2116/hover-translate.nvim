@@ -1,1 +1,1 @@
-return require("translate_hover")
+return require("hover_translate")
