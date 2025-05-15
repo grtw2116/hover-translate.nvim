@@ -74,12 +74,12 @@ local function translate_text(text)
 	else -- deepl
 		translated_text = result.translations and result.translations[1].text or text
 	end
-	
+
 	-- Notify translation complete if not silent
 	if not M.config.silent then
 		vim.notify("翻訳が完了しました", vim.log.levels.INFO)
 	end
-	
+
 	return translated_text
 end
 
@@ -125,4 +125,3 @@ function M.hover(config)
 end
 
 return M
-eturn M
