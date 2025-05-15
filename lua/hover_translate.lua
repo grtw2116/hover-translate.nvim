@@ -44,7 +44,7 @@ local function translate_text(text)
 
 	-- Notify translation start if not silent
 	if not M.config.silent then
-		vim.notify("翻訳を開始しています...", vim.log.levels.INFO)
+		vim.notify("Starting translation...", vim.log.levels.INFO)
 	end
 
 	-- Send HTTP request (using plenary.nvim or curl)
@@ -77,7 +77,7 @@ local function translate_text(text)
 
 	-- Notify translation complete if not silent
 	if not M.config.silent then
-		vim.notify("翻訳が完了しました", vim.log.levels.INFO)
+		vim.notify("Translation completed", vim.log.levels.INFO)
 	end
 
 	return translated_text
@@ -106,7 +106,7 @@ function M.hover(config)
 		end
 		if vim.tbl_isempty(raw) then
 			if not config.silent then
-				vim.notify("ホバー情報がありません", vim.log.levels.WARN)
+				vim.notify("No information available", vim.log.levels.WARN)
 			end
 			return
 		end
