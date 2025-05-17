@@ -4,6 +4,9 @@ local api = vim.api
 local lsp = vim.lsp
 local util = vim.lsp.util
 local Job = require("plenary.job")
+local cache_dir = vim.fn.stdpath("cache") .. "/hover-translate"
+
+vim.fn.mkdir(cache_dir, "p")
 
 -- Default configuration
 M.config = {
@@ -44,6 +47,22 @@ local function build_request(text)
 end
 
 local function translate_text_async(text, on_result)
+	-- Check file cache
+	local key = vim.fn.sha256(text)
+	local cache_file = cache_dir .. "/" .. key .. ".json"
+	if vim.loop.fs_stat(cache_file) then
+		-- Read from JSON
+		local lines = vim.fn.readfile(cache_file)
+		local ok, data = pcall(vim.fn.json_decode, table.concat(lines, "\n"))
+		if ok and data.translated then
+			vim.schedule(function()
+				on_result(data.translated)
+			end)
+			return
+		end
+	end
+
+	-- If there's no cache or reading cache fails, then send translation request
 	local url, body = build_request(text)
 	Job:new({
 		command = "curl",
@@ -68,6 +87,13 @@ local function translate_text_async(text, on_result)
 				translated = result.data and result.data.translations[1].translatedText or text
 			else
 				translated = result.translations and result.translations[1].text or text
+			end
+
+			-- Save translated text to cache file
+			local data = { translated = translated }
+			local ok, err = pcall(vim.fn.writefile, { vim.fn.json_encode(data) }, cache_file)
+			if not ok then
+				vim.notify("[hover-translate.nvim] Writing cache failed: " .. err, vim.log.levels.WARN)
 			end
 
 			vim.notify("Translation completed", vim.log.levels.INFO)
