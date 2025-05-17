@@ -2,6 +2,8 @@
 
 Translate LSP hover documentation in Neovim using Google Translate or DeepL.
 
+> **Note**: This plugin is currently in **ALPHA** stage. Features may change and bugs might be present. Use at your own risk.
+
 ## ✨ Features
 
 - Translates `textDocument/hover` output from LSP
@@ -13,7 +15,7 @@ Translate LSP hover documentation in Neovim using Google Translate or DeepL.
 
 ```lua
 {
-  "your-username/hover-translate.nvim",
+  "grtw2116/hover-translate.nvim",
   config = function()
     require("hover_translate").setup({
       target_lang = "ja", -- Japanese
