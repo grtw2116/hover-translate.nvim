@@ -16,11 +16,15 @@ Translate LSP hover documentation in Neovim using Google Translate or DeepL.
 ```lua
 {
   "grtw2116/hover-translate.nvim",
+  dependencies = { "nvim-lua/plenary.nvim" },
   config = function()
     require("hover_translate").setup({
-      target_lang = "ja", -- Japanese
+      target_lang = "ja", -- target language
       provider = "google", -- or "deepl"
       api_key = os.getenv("TRANSLATE_API_KEY"), -- recommend env vars
+      opts = { -- options for vim.util.open_floating_preview()
+        border = "rounded"
+      },
     })
 
     vim.keymap.set("n", "K", require("hover_translate").hover, { desc = "LSP Hover (translated)" })
