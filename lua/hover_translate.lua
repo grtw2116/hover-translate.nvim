@@ -146,7 +146,11 @@ function M.hover(config)
 		-- Async translate and then show floating
 		translate_text_async(text, function(translated)
 			local tlines = vim.split(translated, "\n")
-			util.open_floating_preview(tlines, "markdown", config.opts or {})
+			local opts = vim.tbl_deep_extend("force", {
+				focusable = true,
+				focus_id = "hover-translate",
+			}, config.opts or {})
+			util.open_floating_preview(tlines, "markdown", opts)
 		end)
 	end)
 end
