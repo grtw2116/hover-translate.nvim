@@ -46,11 +46,28 @@ local function build_request(text)
 	return url, body
 end
 
+local function compute_cache_key(text)
+	local client = vim.lsp.get_clients({ bufnr = 0 })[1]
+
+	---@type table
+	local cmd = type(client.config.cmd) == "table" and client.config.cmd or {}
+	local lsp_id = client and (client.name .. table.concat(cmd, " ")) or ""
+	local hash_input = table.concat({
+		M.config.provider,
+		M.config.target_lang,
+		vim.bo.filetype,
+		lsp_id,
+		text,
+	}, "\n")
+
+	return vim.fn.sha256(hash_input)
+end
+
 local function translate_text_async(text, on_result)
 	-- Check file cache
-	local key = vim.fn.sha256(text)
+	local key = compute_cache_key(text)
 	local cache_file = cache_dir .. "/" .. key .. ".json"
-	if vim.loop.fs_stat(cache_file) then
+	if vim.uv.fs_stat(cache_file) then
 		-- Read from JSON
 		local lines = vim.fn.readfile(cache_file)
 		local ok, data = pcall(vim.fn.json_decode, table.concat(lines, "\n"))
