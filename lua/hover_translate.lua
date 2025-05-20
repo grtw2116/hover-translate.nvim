@@ -14,7 +14,7 @@ M.config = {
 	provider = "google", -- "google" or "deepl"
 	api_key = nil,
 	silent = false,
-	opts = {}, -- options for vim.util.open_floating_preview()
+	hover_window = {}, -- options for vim.util.open_floating_preview()
 }
 
 -- Merge user config with validation
@@ -123,7 +123,7 @@ end
 function M.hover(config)
 	config = config or {}
 	config.silent = M.config.silent
-	config.opts = M.config.opts
+	config.hover_window = M.config.hover_window
 
 	local clients = vim.lsp.get_clients({ bufnr = 0 })
 	if vim.tbl_isempty(clients) then
@@ -166,7 +166,7 @@ function M.hover(config)
 			local opts = vim.tbl_deep_extend("force", {
 				focusable = true,
 				focus_id = "hover-translate",
-			}, config.opts or {})
+			}, config.hover_window or {})
 			util.open_floating_preview(tlines, "markdown", opts)
 		end)
 	end)
