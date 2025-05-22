@@ -17,32 +17,27 @@ Translate LSP hover documentation in Neovim using Google Translate or DeepL.
   "grtw2116/hover-translate.nvim",
   dependencies = { "nvim-lua/plenary.nvim" },
   opts = {
-    target_lang = "ja", -- target language
-    provider = "google", -- or "deepl"
-    api_key = os.getenv("TRANSLATE_API_KEY"), -- recommend env vars
-    silent = false, -- suppress notifications
+    translator = {
+      target_lang = "ja",
+      provider = "google",
+      api_key = os.getenv("TRANSLATE_API_KEY"),
+    },
     hover_window = { -- options for vim.util.open_floating_preview()
       border = "rounded",
     },
-  }
-  config = function(_, opts)
-    require("hover_translate").setup(opts)
-    vim.keymap.set("n", "K", require("hover_translate").hover, { desc = "LSP Hover (translated)" })
-  end,
+    silent = false, -- suppress notifications
+  },
+  keys = {
+    {
+      "gK",
+      function()
+        require("hover_translate").hover()
+      end,
+      desc = "LSP Hover (translated)",
+    },
+  },
 }
 ```
-
-## ⚙️ Configuration
-
-The plugin comes with sensible defaults, but you can customize it with these options:
-
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `target_lang` | string | `"ja"` | Target language for translation |
-| `provider` | string | `"google"` | Translation provider (`"google"` or `"deepl"`) |
-| `api_key` | string | `nil` | API key for the selected provider |
-| `silent` | boolean | `false` | When true, suppresses most notifications |
-| `opts` | table | `{}` | Options passed to `vim.lsp.util.open_floating_preview()` |
 
 ## 📦 Cache System
 
