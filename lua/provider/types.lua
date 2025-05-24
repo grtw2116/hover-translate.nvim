@@ -1,0 +1,3 @@
+---@class hover_translate.Provider
+---@field build_request fun(text: string, config: hover_translate.TranslatorInternalConfig): string, string Build request URL and payload for translation provider.
+---@field parse_response fun(result: table, default_text: string): string Parse response from translation provider.

@@ -1,36 +1,49 @@
+---@class hover_translate.Config
+---@field translator? TranslatorOpts
+---@field silent? boolean
+---@field hover_window? vim.lsp.util.open_floating_preview.Opts
+
+---@class TranslatorOpts
+---@field target_lang? string
+---@field provider? "google"|"deepl"
+---@field api_key? string
+
 local M = {}
 local api = vim.api
 local lsp = vim.lsp
 local util = vim.lsp.util
 local translator = require("translator")
 
--- Default configuration
+---@class hover_translate.InternalConfig
 M.config = {
+	---@class hover_translate.TranslatorInternalConfig
 	translator = {
+		---@type string
 		target_lang = "ja",
+
+		---@type "google" | "deepl"
 		provider = "google", -- "google" or "deepl"
-		api_key = nil,
+
+		---@type string
+		api_key = "",
 	},
+
+	---@type boolean
 	silent = false,
-	hover_window = {}, -- options for vim.util.open_floating_preview()
+
+	---@type vim.lsp.util.open_floating_preview.Opts
+	hover_window = {},
 }
 
--- Merge user config with validation
+---@param user_config hover_translate.Config
 function M.setup(user_config)
 	M.config = vim.tbl_deep_extend("force", M.config, user_config or {})
-
-	translator.setup(M.config.translator)
 end
 
--- Override hover to translate contents asynchronously
-function M.hover(config)
-	config = config or {}
-	config.silent = M.config.silent
-	config.hover_window = M.config.hover_window
-
+function M.hover()
 	local clients = vim.lsp.get_clients({ bufnr = 0 })
 	if vim.tbl_isempty(clients) then
-		if not config.silent then
+		if not M.config.silent then
 			vim.notify("[hover-translate.nvim] No LSP client available", vim.log.levels.WARN)
 		end
 		return
@@ -53,7 +66,7 @@ function M.hover(config)
 			end
 		end
 		if vim.tbl_isempty(raw) then
-			if not config.silent then
+			if not M.config.silent then
 				vim.notify("[hover-translate.nvim] No hover information", vim.log.levels.WARN)
 			end
 			return
@@ -64,12 +77,12 @@ function M.hover(config)
 		local text = table.concat(lines, "\n")
 
 		-- Async translate and then show floating
-		translator.translate(text, function(translated)
+		translator.translate(text, M.config.translator, function(translated)
 			local tlines = vim.split(translated, "\n")
 			local opts = vim.tbl_deep_extend("force", {
 				focusable = true,
 				focus_id = "hover-translate",
-			}, config.hover_window or {})
+			}, M.config.hover_window or {})
 			util.open_floating_preview(tlines, "markdown", opts)
 		end)
 	end)
