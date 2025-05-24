@@ -1,11 +1,12 @@
+---@alias ValidProvider "google" | "deepl" | "deepl_free"
+
 ---@class hover_translate.Config
 ---@field translator? TranslatorOpts
----@field silent? boolean
 ---@field hover_window? vim.lsp.util.open_floating_preview.Opts
 
 ---@class TranslatorOpts
 ---@field target_lang? string
----@field provider? "google"|"deepl"
+---@field provider? ValidProvider
 ---@field api_key? string
 
 local M = {}
@@ -21,15 +22,12 @@ M.config = {
 		---@type string
 		target_lang = "ja",
 
-		---@type "google" | "deepl"
-		provider = "google", -- "google" or "deepl"
+		---@type ValidProvider Translation provider to translate hover documents.
+		provider = "google",
 
 		---@type string
 		api_key = "",
 	},
-
-	---@type boolean
-	silent = false,
 
 	---@type vim.lsp.util.open_floating_preview.Opts
 	hover_window = {},
@@ -43,9 +41,7 @@ end
 function M.hover()
 	local clients = vim.lsp.get_clients({ bufnr = 0 })
 	if vim.tbl_isempty(clients) then
-		if not M.config.silent then
-			vim.notify("[hover-translate.nvim] No LSP client available", vim.log.levels.WARN)
-		end
+		vim.notify("[hover-translate.nvim] No LSP client available", vim.log.levels.INFO)
 		return
 	end
 
@@ -66,9 +62,7 @@ function M.hover()
 			end
 		end
 		if vim.tbl_isempty(raw) then
-			if not M.config.silent then
-				vim.notify("[hover-translate.nvim] No hover information", vim.log.levels.WARN)
-			end
+			vim.notify("[hover-translate.nvim] No hover information", vim.log.levels.INFO)
 			return
 		end
 

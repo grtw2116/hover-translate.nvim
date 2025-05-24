@@ -8,6 +8,7 @@ vim.fn.mkdir(cache_dir, "p")
 local providers = {
 	google = require("provider.google"),
 	deepl = require("provider.deepl"),
+	deepl_free = require("provider.deepl_free"),
 }
 
 ---@param text string text to translate
@@ -56,10 +57,26 @@ function M.translate(text, config, on_result)
 	end
 
 	-- If there's no cache or reading cache fails, then send translation request
-	local url, body = provider.build_request(text, config)
+	local url, body, headers = provider.build_request(text, config)
+
+	-- Prepare curl arguments
+	local args = { "-s", "-X", "POST" }
+
+	-- Add headers
+	headers = headers or {}
+	for key, value in pairs(headers) do
+		table.insert(args, "-H")
+		table.insert(args, key .. ": " .. value)
+	end
+
+	-- Add URL and body
+	table.insert(args, url)
+	table.insert(args, "-d")
+	table.insert(args, body)
+
 	Job:new({
 		command = "curl",
-		args = { "-s", "-X", "POST", "-H", "Content-Type: application/json", url, "-d", body },
+		args = args,
 		on_exit = vim.schedule_wrap(function(j_self, return_val)
 			local resp = table.concat(j_self:result(), "")
 
@@ -70,11 +87,18 @@ function M.translate(text, config, on_result)
 
 			local ok, result = pcall(vim.fn.json_decode, resp)
 			if not ok or not result then
-				vim.notify("[hover-translate.nvim] Invalid JSON response", vim.log.levels.ERROR)
+				vim.notify("[hover-translate.nvim] Cannot decode JSON response", vim.log.levels.ERROR)
 				return
 			end
 
-			local translated = provider.parse_response(result, text)
+			local ok, translated = pcall(provider.parse_response, result)
+			if not ok then
+				vim.notify(
+					"[hover-translate.nvim] Invalid JSON response: " .. vim.inspect(result),
+					vim.log.levels.ERROR
+				)
+				return
+			end
 
 			-- Save translated text to cache file
 			local data = { translated = translated }

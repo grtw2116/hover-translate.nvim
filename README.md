@@ -19,13 +19,12 @@ Translate LSP hover documentation in Neovim using Google Translate or DeepL.
   opts = {
     translator = {
       target_lang = "ja",
-      provider = "google",
+      provider = "google", -- "google", "deepl", or "deepl_free"
       api_key = os.getenv("TRANSLATE_API_KEY"),
     },
     hover_window = { -- options for vim.util.open_floating_preview()
       border = "rounded",
     },
-    silent = false, -- suppress notifications
   },
   keys = {
     {

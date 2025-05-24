@@ -1,7 +1,7 @@
 ---@type hover_translate.Provider
 local M = {
 	build_request = function(text, config)
-		local url = "https://api.deepl.com/v2/translate"
+		local url = "https://api-free.deepl.com/v2/translate"
 		local body = vim.fn.json_encode({ text = { text }, target_lang = config.target_lang:upper() })
 		local headers = {
 			["Authorization"] = "DeepL-Auth-Key " .. config.api_key,
